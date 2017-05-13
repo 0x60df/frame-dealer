@@ -186,11 +186,11 @@ In `frame-dealer-mode', frame position is set according to
 ;;;###autoload
 (defun frame-dealer-random (frame)
   "Dealing rule to set frame position randomly."
-  (let ((left-limit (- (display-pixel-width)
+  (let ((left-limit (- (display-pixel-width (frame-parameter frame 'display))
                        (if frame
                            (frame-pixel-width frame)
                          0)))
-        (top-limit (- (display-pixel-height)
+        (top-limit (- (display-pixel-height (frame-parameter frame 'display))
                       (if frame
                           (frame-pixel-height frame)
                         0))))
