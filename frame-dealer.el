@@ -215,8 +215,9 @@ In `frame-dealer-mode', frame position is set according to
   "Set FRAME position according to `frame-dealer-dealing-rule'
 If FRAME is nil, it defaults to the selected frame."
   (interactive)
-  (let ((alist (frame-dealer--generate-positional-frame-parameters frame)))
-    (if alist (modify-frame-parameters frame alist))))
+  (if (assq 'display (frame-parameters frame))
+      (let ((alist (frame-dealer--generate-positional-frame-parameters frame)))
+        (if alist (modify-frame-parameters frame alist)))))
 
 (provide 'frame-dealer)
 
