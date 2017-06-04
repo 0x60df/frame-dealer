@@ -4,7 +4,7 @@
 ;; Copyright (C) 2017 by 0x60DF
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
-;; Version: 0.2.2
+;; Version: 0.3.0
 ;; Keywords: frame
 ;; URL: https://github.com/0x60df/frame-dealer
 
@@ -75,6 +75,9 @@ positional parameter to arguments of `make-frame'"
 
 (defvar frame-dealer--model-frames nil
   "Model frames which could not be deleted instantly for any reason")
+
+(defvar frame-dealer--dealing-rules nil
+  "List of dealing rules")
 
 (defun frame-dealer--generate-positional-frame-parameters (frame)
   "Generate alist containing positional frame parameters,
@@ -197,6 +200,21 @@ In `frame-dealer-mode', frame position is set according to
                  #'frame-dealer--post-processing-dispatcher)))
 
 ;;;###autoload
+(defun frame-dealer-add-rule (rule)
+  "Add rule to `frame-dealer--dealing-rules'."
+  (interactive "aFunction: ")
+  (add-to-list 'frame-dealer--dealing-rules rule))
+
+;;;###autoload
+(defun frame-dealer-select-rule (rule)
+  "Select rule from rules stored in `frame-dealer--dealing-rules'."
+  (interactive (list (intern
+                      (completing-read
+                       "Rule: "
+                       (mapcar 'symbol-name frame-dealer--dealing-rules)))))
+  (setq frame-dealer-dealing-rule rule))
+
+;;;###autoload
 (defun frame-dealer-random (frame)
   "Dealing rule to set frame position randomly."
   (let ((left-limit (- (display-pixel-width (frame-parameter frame 'display))
@@ -208,6 +226,8 @@ In `frame-dealer-mode', frame position is set according to
                           (frame-pixel-height frame)
                         0))))
     `(,(random left-limit) ,(random top-limit))))
+
+(frame-dealer-add-rule 'frame-dealer-random)
 
 ;;;###autoload
 (defun frame-dealer-perturbation (frame)
@@ -233,6 +253,8 @@ after set by window system perturb position."
     (if (< bottom-edge bottom-bound) (setq bottom-bound bottom-edge))
     `(,(+ left-bound (random (- right-bound left-bound)))
       ,(+ top-bound (random (- bottom-bound top-bound))))))
+
+(frame-dealer-add-rule 'frame-dealer-perturbation)
 
 ;;;###autoload
 (defun frame-dealer-deal-frame (&optional frame)
