@@ -4,7 +4,7 @@
 ;; Copyright (C) 2017 by 0x60DF
 
 ;; Author: 0x60DF <0x60DF@gmail.com>
-;; Version: 0.2.1
+;; Version: 0.2.2
 ;; Keywords: frame
 ;; URL: https://github.com/0x60df/frame-dealer
 
@@ -65,6 +65,12 @@ positional parameter to arguments of `make-frame'"
 (defcustom frame-dealer-lighter " FD"
   "Lighter for frame-dealer-mode"
   :type 'string
+  :group 'frame-dealer)
+
+;;;###autoload
+(defcustom frame-dealer-perturbation-metric 200
+  "Metric for perturbation of frame position"
+  :type 'integer
   :group 'frame-dealer)
 
 (defvar frame-dealer--model-frames nil
@@ -202,6 +208,31 @@ In `frame-dealer-mode', frame position is set according to
                           (frame-pixel-height frame)
                         0))))
     `(,(random left-limit) ,(random top-limit))))
+
+;;;###autoload
+(defun frame-dealer-perturbation (frame)
+  "Dealing rule to set frame position according to window system, and
+after set by window system perturb position."
+  (let* ((left (if frame (frame-parameter frame 'left) 0))
+         (top (if frame (frame-parameter frame 'top) 0))
+         (left-bound (- left frame-dealer-perturbation-metric))
+         (top-bound (- top frame-dealer-perturbation-metric))
+         (right-bound (+ left frame-dealer-perturbation-metric))
+         (bottom-bound (+ top frame-dealer-perturbation-metric))
+         (width (if frame (frame-pixel-width frame) 0))
+         (height (if frame (frame-pixel-height frame) 0))
+         (left-edge 0)
+         (top-edge 0)
+         (right-edge (- (display-pixel-width (frame-parameter frame 'display))
+                        width))
+         (bottom-edge (- (display-pixel-height (frame-parameter frame 'display))
+                         height)))
+    (if (< left-bound left-edge) (setq left-bound left-edge))
+    (if (< top-bound top-edge) (setq top-bound top-edge))
+    (if (< right-edge right-bound) (setq right-bound right-edge))
+    (if (< bottom-edge bottom-bound) (setq bottom-bound bottom-edge))
+    `(,(+ left-bound (random (- right-bound left-bound)))
+      ,(+ top-bound (random (- bottom-bound top-bound))))))
 
 ;;;###autoload
 (defun frame-dealer-deal-frame (&optional frame)
