@@ -64,7 +64,8 @@ positional parameter to arguments of `make-frame'"
 ;;;###autoload
 (defcustom frame-dealer-lighter " FD"
   "Lighter for frame-dealer-mode"
-  :type 'string)
+  :type 'string
+  :group 'frame-dealer)
 
 (defvar frame-dealer--model-frames nil
   "Model frames which could not be deleted instantly for any reason")
